@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Todo } from './todo';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit{
   title = 'workshop3-new';
   form:FormGroup;
   tomorrow=new Date();
@@ -28,6 +28,11 @@ export class AppComponent {
       dueDate: this.dueDateFormControl
     })
   }
+
+  ngOnInit(): void {
+    
+  }
+
   addToDo(){
     console.log("Add todo")
     let taskId = uuidv4();
