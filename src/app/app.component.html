@@ -20,22 +20,30 @@
           </mat-card-header>
           <mat-card-content>
             <mat-form-field>
-              <input matInput />
+              <input matInput formControlName="Task name">
             </mat-form-field>
             <div>
-              <label for="">Priority</label>
-              <mat-radio-group>
-                <mat-radio-button>low</mat-radio-button>
+              <label for="">Priority &nbsp;</label>
+              <mat-radio-group 
+                formControlName='priority' 
+                aria-label="Select a priority"
+              >
+                <mat-radio-button *ngFor="let p of priorities" value={{p}}>{{p}} &nbsp;</mat-radio-button>
               </mat-radio-group>
             </div>
             <div>
               <mat-form-field>
-                <input matInput [matDatepicker]="picker" formControlName="dueDate" [min]="tomorrow" />
+                <input matInput 
+                  [matDatepicker]="picker" 
+                  formControlName="dueDate" 
+                  [min]="tomorrow"
+                >
                 <mat-datepicker-toggle matSuffix [for]="picker">
                   <mat-datepicker #picker></mat-datepicker>
+                </mat-datepicker-toggle>
               </mat-form-field>
               <div>
-                <button mat-raised-button color="primary" type="button">Add</button>
+                <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Add</button>
                 <button mat-raised-button color="primary" type="button">Update</button>
               </div>
             </div>
