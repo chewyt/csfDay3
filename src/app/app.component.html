@@ -1,56 +1,135 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" style="margin-bottom: 1em;">
   <mat-toolbar-row>
-    <span>My Lovely ToDo App</span>
+    <span>Task Tracker on Time</span>
   </mat-toolbar-row>
 </mat-toolbar>
 
 <div class="content">
-  <div fxFlexFill fxLayout="row wrap" fxLayout.xs="column wrap" fxLayout.sm="column wrap" fxLayoutGap="15px grid">
+  <div fxFlexFill fxLayout="row wrap" fxLayoutAlign="center none" fxLayout.xs="row wrap" fxLayoutAlign.xs="center none"
+    fxLayout.sm="row wrap" fxLayoutAlign.sm="center none" fxLayout.md="row wrap" fxLayoutAlign.md="center none"
+    fxLayout.lg="row wrap" fxLayoutAlign.lg="center none" fxLayoutGap="0.5em grid">
 
-    <div>
-      <form [formGroup]="form" (ngSubmit)="addToDo()" #formDirective="ngForm">
+    <div class="example-form">
+      <!-- <form [formGroup]="form" (ngSubmit)="addToDo(); formDirective.resetForm()" #formDirective="ngForm"> -->
+      <form [formGroup]="form">
         <mat-card>
           <mat-card-header>
-            <mat-card-title>
+            <mat-card-title *ngIf="buttonToggle">
               Add ToDo
             </mat-card-title>
-            <mat-card-title>
+            <mat-card-title *ngIf="!buttonToggle">
               Edit ToDo
             </mat-card-title>
           </mat-card-header>
           <mat-card-content>
-            <mat-form-field>
-              <input matInput formControlName="task">
-            </mat-form-field>
             <div>
-              <label for="">Priority &nbsp;</label>
+              <mat-form-field class="example-full-width" appearance="fill">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" placeholder="bro@example.com">
+                <mat-hint *ngIf="!emailFormControl.valid">Hint: Please fill up properly</mat-hint>
+                <mat-error *ngIf="form.get('email')!.hasError('email') && !form.get('email')!.hasError('required')">
+                  Invalid email</mat-error>
+                <mat-error *ngIf="form.get('email')!.hasError('required')">Email is <span>f***ing</span> required
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div>
+              <mat-form-field class="example-full-width" appearance="fill"
+                style="margin-top: 10px; margin-bottom: 10px;">
+                <mat-label>Task</mat-label>
+                <input matInput formControlName="task" placeholder="Your task here">
+                <mat-hint *ngIf="!taskFormControl.valid " class="warning">Hint: Add some task
+                  bro</mat-hint>
+                <mat-error *ngIf="taskFormControl.hasError('minlength') && !taskFormControl.hasError('required')">
+                  Task too short.</mat-error>
+                <mat-error *ngIf="taskFormControl.hasError('required')&& taskFormControl.touched">Task is empty.
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <!-- <mat-error *ngIf="form.invalid">ddd</mat-error> -->
+            <div>
+              <label for="">Priority &nbsp;&nbsp;&nbsp;</label>
               <mat-radio-group formControlName='priority' aria-label="Select a priority">
                 <mat-radio-button *ngFor="let p of priorities" value="{{p}}">{{p}} &nbsp;</mat-radio-button>
               </mat-radio-group>
+              <!-- <mat-error *ngIf="form.get('priority')!.hasError('required') ">Choose a priority</mat-error> -->
             </div>
+            <mat-hint style="font-size: 10px; padding-left: 52.5px;padding-right: 10.5px; margin-top: 7px;"
+              *ngIf="form.get('priority')!.hasError('required')">Hint: Choose a priority</mat-hint>
             <div>
-              <mat-form-field>
+              <mat-form-field style="margin-top: 10px; margin-bottom: 10px;">
                 <input matInput [matDatepicker]="picker" formControlName="dueDate" [min]="tomorrow">
                 <mat-datepicker-toggle matSuffix [for]="picker">
                   <mat-datepicker #picker></mat-datepicker>
                 </mat-datepicker-toggle>
+                <mat-hint *ngIf="form.get('dueDate')!.hasError('required')">Hint: Select a date</mat-hint>
+                <mat-error *ngIf="form.get('dueDate')!.invalid && !form.get('dueDate')!.hasError('required')">Invalid
+                  Date</mat-error>
+                <mat-error *ngIf="form.get('dueDate')!.hasError('required')">Date empty</mat-error>
               </mat-form-field>
               <div>
-                <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Add</button>
-                <button mat-raised-button color="primary" type="button">Update</button>
+                <button mat-raised-button color="primary" type="submit" style="margin: 10px;"
+                  [disabled]="form.invalid || !buttonToggle" (click)="onSubmit()">
+                  Add
+                </button>
+                <button mat-raised-button color="primary" type="button" style="margin: 10px;"
+                  [disabled]="form.invalid || buttonToggle" (click)="updateTask()">
+                  Update
+                </button>
+                <mat-error *ngIf="form.invalid && (!form.untouched)">Please fill in the mandatory fields</mat-error>
+
               </div>
             </div>
           </mat-card-content>
         </mat-card>
+      </form>
+    </div>
+    <div class="example-form">
+      <form>
         <mat-card>
-          <mat-card-header>My Cart List</mat-card-header>
+          <mat-card-header fxLayoutAlign="space-between center" >
+            <mat-card-title>My Cart List</mat-card-title>
+            <button style="margin-bottom: 5px;"
+                    (click)="showUncompleted()" 
+                    mat-icon-button color="primary">
+              <mat-icon>remove_red_eye</mat-icon>
+            </button>
+          </mat-card-header>
           <mat-card-content>
+            <div *ngIf="todosValues.length==0" fxLayoutAlign="center center" style="color: gray;margin-top: 5px;">No
+              tasks at this moment</div>
             <div *ngFor="let t of todosValues">
-              {{t.task}} ---- {{t.dueDate | date:"dd/MM/yyyy"}} -----------{{t.priority}}
+
+              <mat-card *ngIf="this.showAll || (!this.showAll&&!t.status)" class="todo" (mouseover)="t.hover=true" (mouseleave)="t.hover=false" (click)="toggle(t)">
+                <button *ngIf="t.status&&t.hover" fxFlex="8" fxLayoutAlign="none center" mat-icon-button color="basic">
+                  <mat-icon>radio_button_checked</mat-icon>
+                </button>
+                <button *ngIf="!t.status&&t.hover" fxFlex="8" fxLayoutAlign="none center" mat-icon-button color="basic">
+                  <mat-icon>radio_button_unchecked</mat-icon>
+                </button>
+                <div fxFlex="82" fxLayoutAlign="none none" fxLayout="column">
+                  <span>
+                    <strong>[Due by: {{t.dueDate | date:"dd/MM/yyyy"}}]</strong>
+                    <strong [style.color]="getColor(t.priority)">&nbsp;&nbsp;{{t.priority.toUpperCase()}}</strong>
+                  </span>
+                  <span [style]="strikethrough(t)">{{t.task}}</span>
+                </div>
+                <div *ngIf="t.hover" fxFlex="7" fxLayoutAlign="none none" fxLayout="row">
+                  <button (click)="editTask(t)" fxFlex mat-icon-button color="primary">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button fxFlex="10" (click)="deleteTask(t)" mat-icon-button color="warn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+              </mat-card>
+              <br>
             </div>
           </mat-card-content>
         </mat-card>
       </form>
+
     </div>
 
 
