@@ -26,6 +26,7 @@ export class AppComponent implements OnInit{
   buttonToggle: boolean = true; //true for Add and false for Update
   tempTaskId: string ='';
   showAll: boolean = true;
+  colorEye: string ='';
 
 
 
@@ -109,7 +110,7 @@ export class AppComponent implements OnInit{
   updateTask(){
 
     this.buttonToggle=true;
-    alert("Update")
+    // alert("Update")
 
     
     // let taskId = uuidv4();
@@ -176,6 +177,13 @@ export class AppComponent implements OnInit{
 
   showUncompleted(){
     this.showAll=!this.showAll;
-    
+    if (this.showAll){
+      
+      this.colorEye = 'grey';
+    }else{
+      this.colorEye = 'black';
+
+    }
+
   }
 }

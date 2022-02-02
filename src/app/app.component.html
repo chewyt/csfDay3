@@ -90,8 +90,9 @@
           <mat-card-header fxLayoutAlign="space-between center" >
             <mat-card-title>My Cart List</mat-card-title>
             <button style="margin-bottom: 5px;"
+                    [style.color]= "colorEye"
                     (click)="showUncompleted()" 
-                    mat-icon-button color="primary">
+                    mat-icon-button color="basic">
               <mat-icon>remove_red_eye</mat-icon>
             </button>
           </mat-card-header>
